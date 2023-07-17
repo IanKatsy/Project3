@@ -11,59 +11,58 @@
 #include "pgm.h"
 
 #include <stdio.h>
-#include <stdint.h>
 #include <string.h>
 #include <stdlib.h>
 #include <unistd.h>
 
-enum argv_names {arg_program = 0,
-        arg_flag,
-        arg_name,
-        arg_columns,
-        arg_rows,
-        arg_depth};
+enum argv_names {
+	arg_program = 0,
+	arg_flag,
+	arg_name,
+	arg_columns,
+	arg_rows,
+	arg_depth
+};
 
 int main(int argc, char **argv) {
 
-  FILE *fp;
+	char *file = NULL;
 
-  char *file;
+	switch (argc) {
 
-  switch (argc) {
+		case 3:
 
-    case 3:
+			if (strcmp(argv[arg_flag], "-l") != 0) {
+				file = NULL;
+				break;
+			}
 
-      if (strcmp(argv[arg_flag], "-l")) {
-        usage();
-        return 1;
-      }
+			size_t len = strlen(argv[arg_name]) + strlen(".pgm");
+			file = malloc(len + 1);
+			file[len] = 0;
 
-      size_t len = strlen(argv[arg_name]) + strlen(".pgm");
-      file = malloc(len + 1);
-      file[len] = 0;
+			strcpy(file, argv[arg_name]);
+			strcat(file, ".pgm");
 
-      strcpy(file, argv[arg_name]);
-      strcat(file, ".pgm");
+			if (access(file, F_OK)) {
+				printf("File %s does not exist!\n", file);
+				file = NULL;
+				break;
+			}
 
-      if (access(file, F_OK)) {
-        printf("File %s does not exist!\n", file);
-        return 1;
-      }
+			break;
+		case 6:
 
-      break;
-    case 6:
+			if (strcmp(argv[arg_flag], "-n") != 0) {
+				file = NULL;
+				break;
+			}
 
-      if (strcmp(argv[arg_flag], "-n")) {
-        usage();
-        return 1;
-      }
+			break;
 
-      break;
+		default:
+			break;
+	}
 
-    default:
-      usage();
-      return 1;
-  }
-
-  return main_loop(file);
+	return main_loop(file);
 }
